@@ -9,27 +9,42 @@ class Resistor {
     getPower(u: number): number {
         return u * this.getCurrent(u);
     }
-    getamps(w: number, v:number): number {
-        return  w / v
-    }
-    getOhms(v: number, w:number): number{
-        return v / this.getamps(w, v);
-    }
-    getwater(w: number, ml:number): number{
-        return Math.floor(20 + (60 /(4.19 * (ml / w))))
+    getResistance(): number {
+        return this.r;
     }
 }
-// Mitu vatti soojust eraldub takistist?
-let r1 = new Resistor(2.5);
-console.log(r1.getPower(5));
 
-// Mitu amprit voolu läbib takistit?
-console.log(r1.getamps(6,4));
-// Mitu oomi on eelneva takisti takistus?
-console.log(r1.getOhms(4,6))
-//Mitme kraadi peale tõuseb vee temperatuur 20 kraadi Celsiuse pealt ühe minutiga
-console.log(r1.getwater(1000, 1000))
-// Mitu amprit voolu läbib eelnimetatud veekeedukannu, kui võrgupinge on 220 volti?
-console.log(r1.getamps(1000, 220))
-// Mitu oomi on selle veekeedukannu takistus?
-console.log(r1.getOhms(220, 1000))
+class SeriesCircuit {
+    resistors: Resistor[] = []
+    push(r: Resistor) {
+        this.resistors.push(r);
+    }
+    getTotalResistance() {
+        let sum: number = 0;
+        this.resistors.forEach((r: Resistor) => { sum += r.getResistance() });
+        return sum;
+    }
+    getCurrent(u: number) {
+        return u / this.getTotalResistance();
+    }
+    getPower(u: number): number {
+        return u * this.getCurrent(u);
+    }
+    getAllPower(u:number){
+        let powers : any  = []
+        this.resistors.forEach((r:Resistor)=> {
+            powers.push(r.getPower(u))
+        })
+        return powers
+    }
+
+}
+
+let sc1: SeriesCircuit = new SeriesCircuit();
+sc1.push(new Resistor(110));
+sc1.push(new Resistor(220));
+sc1.push(new Resistor(220));
+console.log(sc1.getTotalResistance());
+console.log(sc1.getCurrent(12));
+console.log(sc1.getPower(12))
+console.log(sc1.getAllPower(12))
